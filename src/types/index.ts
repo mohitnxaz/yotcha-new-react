@@ -226,8 +226,8 @@ export interface Property {
   currency: string;
   area: string;
   area_unit: string;
-  bed_room: number;
-  bath_room: number;
+  bed_room: string;
+  bath_room: string;
   address: string;
   country: string;
   listed_id: number | null;
@@ -268,6 +268,63 @@ export interface Property {
   photos: File[];
   videos: File[];
   additionalPhotos: File[];
+}
+
+export interface PropertyTypesFormik {
+  property: {
+    property: any;
+    selectedAmenities: AmenitySelection[];
+    property_name: string;
+    property_status: string;
+    project_status: string;
+    walking_distance: string;
+    price: string;
+    currency: string;
+    area: string;
+    area_unit: string;
+    bed_room: string;
+    bath_room: string;
+    address: string;
+    country: string;
+    listed_id: number | null;
+    unit_number: string;
+    tenure: string;
+    listed_on: string;
+    total_units: number | null;
+    current_tenanted: boolean;
+    floor_level: string;
+    furnished_status: string;
+    build_year: string;
+    description: string;
+    latitude: number | null;
+    longitude: number | null;
+    dynamic_amenities: string[];
+    city: string;
+    state: string;
+    contact_name: string;
+    username: string;
+    email: string;
+    contact_no: number | null;
+    contact_latitude: number | null;
+    contact_longitude: number | null;
+    listing_feature: string;
+    developer: string;
+    tag: string[];
+    listed_type: string;
+    completion_year: string;
+    project_stage: string;
+    id: number | null;
+    created_at: string;
+    updated_at: string;
+    created_by_id: number;
+    propety_status: string;
+    property_type: PropertyType;
+    property_subtype: PropertySubType;
+    amenities: any[];
+    photos: File[];
+    videos: File[];
+    additionalPhotos: File[];
+  }
 }
 
 export interface Image {

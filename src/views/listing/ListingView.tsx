@@ -37,13 +37,18 @@ import ListViewListing from "../../components/common/ListViewListing";
 import OrderFilter from "../../components/listing/OrderFilter";
 import PriceFilterComponent from "../../components/listing/PriceFilterOption";
 import FilterComponentListing from "../../components/listing/FilterComponent";
+import {
+  getFilteredListingsAsync,
+  getPagninatedResultsAsync,
+} from "../../store/slices/filter/filterThunk";
+import { AppDispatch } from "../../store/store";
 
 const validationScheme = yup.object({});
 
 const ListingView = () => {
   const [itemView, setItemView] = useState("grid");
   const [mapShown, setMapShown] = useState(false);
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const location = useLocation();
   /////////take values from url and refetch buildings////////////
   //cc//
@@ -77,21 +82,11 @@ const ListingView = () => {
     (state: any) => state.filter.filteredData
   );
   const currentCount = filteredListing ? filteredListing.properties.length : 0;
-
   console.log(currentCount, "current length");
   const hasMore = currentCount <= 30;
   console.log(hasMore, "hasmore");
   const filteraddress =
     useSelector((state: any) => state.filter.topFilters.address) || "";
-
-  const propertyType =
-    useSelector((state: any) => state.filter.topFilters.property_type) || "";
-
-  const minPrice =
-    useSelector((state: any) => state.filter.topFilters.min_price) || "";
-
-  const maxPrice =
-    useSelector((state: any) => state.filter.topFilters.max_price) || "";
 
   const prevOffset = useSelector(
     (state: any) => state.filter.selectedFilters.offset
@@ -106,27 +101,17 @@ const ListingView = () => {
     setItemView(option);
   };
   let newOffset = 0;
-  const handlePagination = async () => {
-    console.log("handle", currentCount, filteredData, filterValues);
-
+  const filterValuess = useSelector(
+    (state: any) => state.filter.selectedFilters
+  );
+  const fetchMoreData = async () => {
     try {
-      newOffset =
-        prevOffset <= filteredListing.total - 20 ? prevOffset + 10 : prevOffset;
-      console.log("handle111111", currentCount, newOffset);
-
-      dispatch(
-        setFilterFields({
-          offset: newOffset,
-        })
-      );
-
-      // const response = await getFilteredListing({
-      //   ...filterData,
-      //   offset: newOffset,
-      // });
-
-      // console.log("values", response?.data);
-      // dispatch(getPaginatedResults(response?.data?.properties));
+      const updatedFilterValues = {
+        ...filterValuess,
+        offset: offset + 10,
+      };
+      dispatch(getPagninatedResultsAsync(updatedFilterValues));
+      setOffset(offset + 10);
     } catch (error) {
       console.error("Error fetching filtered listings:", error);
     }
@@ -181,6 +166,8 @@ const ListingView = () => {
   const filterValuesPropertyType = useSelector(
     (state: any) => state.filter.filterValues.property_type
   );
+
+  const [offset, setOffset] = useState(prevOffset);
 
   const handleSetPropertyType = (value: string) => {
     dispatch(
@@ -321,15 +308,13 @@ const ListingView = () => {
               {itemView === "grid" ? (
                 filteredListing?.properties.length > 0 ? (
                   <InfiniteScroll
-                    next={handlePagination}
+                    next={fetchMoreData}
                     scrollThreshold={0.7}
                     hasMore={
-                      filteredData?.total !==
-                        filteredData?.properties?.length &&
-                      filteredData?.total !== 0
+                      filteredData?.properties?.length < filteredData?.total
                     }
                     loader={<div>Loading...</div>}
-                    dataLength={filteredData?.properties?.length ?? 0}
+                    dataLength={filteredData?.properties?.length}
                     endMessage={
                       <div className="text-center mt-10">End of list</div>
                     }
@@ -343,7 +328,7 @@ const ListingView = () => {
                 )
               ) : filteredListing?.properties.length > 0 ? (
                 <InfiniteScroll
-                  next={handlePagination}
+                  next={fetchMoreData}
                   scrollThreshold={0.7}
                   hasMore={
                     filteredData?.total !== filteredData?.properties?.length &&

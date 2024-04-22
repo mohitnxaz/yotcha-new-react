@@ -133,7 +133,6 @@ import GreenButton from "../../../components/GreenButton";
 import WhiteButton from "../../../components/WhiteButton";
 import sandwich from "../../../../public/icons/Vector (3).svg";
 
-
 export interface NavItem {
   title: string;
   to?: string;
@@ -185,36 +184,36 @@ const Topbar = ({ items }: TopbarProps) => {
     >
       <div className="md:container flex w-full items-center sm:justify-between md:px-[24px] py-[18px] ">
         <div className="flex gap-16">
-        <div className="px-4">
-          <Link to="/" >
-            <img src={logoIcon} alt={""}/>
-          </Link>
+          <div className="px-4">
+            <Link to="/">
+              <img src={logoIcon} alt={""} />
+            </Link>
+          </div>
+          <div className="hidden md:flex">
+            {items?.length ? (
+              <nav className="flex gap-10">
+                {items?.map(
+                  (item, index) =>
+                    item.to && (
+                      <Link
+                        key={index}
+                        to={item.to}
+                        className={cn(
+                          "flex items-center text-sm font-medium text-muted-foreground",
+                          item.disabled && "cursor-not-allowed opacity-80"
+                        )}
+                      >
+                        <div className="text-[#0B2C3D] text-[15px] font-[400]">
+                          {item.title}
+                        </div>
+                      </Link>
+                    )
+                )}
+              </nav>
+            ) : null}
+          </div>
         </div>
-        <div className="hidden md:flex">
-        {items?.length ? (
-            <nav className="flex gap-10">
-              {items?.map(
-                (item, index) =>
-                  item.to && (
-                    <Link
-                      key={index}
-                      to={item.to}
-                      className={cn(
-                        "flex items-center text-sm font-medium text-muted-foreground",
-                        item.disabled && "cursor-not-allowed opacity-80"
-                      )}
-                    >
-                      <div className="text-[#0B2C3D] text-[15px] font-[400]">
-                        {item.title}
-                      </div>
-                    </Link>
-                  )
-              )}
-            </nav>
-          ) : null}
-          </div>
-          </div>
-        <div className=" items-center ">
+        <div className="flex">
           {isLoggedIn ? (
             <Link to={"/add-property"}>
               <GreenButton
@@ -248,37 +247,37 @@ const Topbar = ({ items }: TopbarProps) => {
                 </div>
               )}
             </div>
-      
-          {/* dropdown menu for mobile view */}
-          <div className="sm:hidden">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-500 hover:text-gray-700 focus:outline-none"
-            >
-              <svg
-                className="h-6 w-6"
-                stroke="currentColor"
-                fill="none"
-                viewBox="0 0 24 24"
+
+            {/* dropdown menu for mobile view */}
+            <div className="sm:hidden">
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className="text-gray-500 hover:text-gray-700 focus:outline-none"
               >
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
-          </div>
+                <svg
+                  className="h-6 w-6"
+                  stroke="currentColor"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  {isOpen ? (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  ) : (
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M4 6h16M4 12h16M4 18h16"
+                    />
+                  )}
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
         {/* navigation items */}

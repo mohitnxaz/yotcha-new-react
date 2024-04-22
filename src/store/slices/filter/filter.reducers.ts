@@ -1,6 +1,10 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { PropertyListCardProps } from "../../../types";
-import { getFilteredListingsAsync, getFilterOptionsAsync } from "./filterThunk";
+import {
+  getFilteredListingsAsync,
+  getFilterOptionsAsync,
+  getPagninatedResultsAsync,
+} from "./filterThunk";
 
 export interface TopFilterValuesTypes {
   address: string;
@@ -229,6 +233,22 @@ export const filterSlice = createSlice({
       })
       .addCase(getFilteredListingsAsync.rejected, (state, action) => {
         state.error = "Some error occured while fetch data";
+        state.loading = false;
+      });
+    builder
+      .addCase(getPagninatedResultsAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getPagninatedResultsAsync.fulfilled, (state, action) => {
+        state.filteredData.properties = [
+          ...state.filteredData.properties,
+          ...action.payload.properties,
+        ];
+        state.filteredData.total = action.payload.total;
+        state.loading = false;
+      })
+      .addCase(getPagninatedResultsAsync.rejected, (state, action) => {
+        state.error = "Some error occured while fetch more data";
         state.loading = false;
       });
     // Handle other async thunks similarly

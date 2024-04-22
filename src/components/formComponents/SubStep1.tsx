@@ -8,6 +8,8 @@ import sell1 from "../../../public/sell1.svg";
 
 import { useFormikContext } from "formik";
 import FormikCard from "./components/FormikCard";
+import { useDispatch } from "react-redux";
+import { setError } from "../../store/slices/addProperty/addProperty.reducers";
 
 type Option = "SALE" | "RENT" | null;
 
@@ -23,15 +25,20 @@ interface SubStep1Props {
 const SubStep1: React.FC<SubStep1Props> = ({ next }) => {
   const [selectedOption, setSelectedOption] = useState<Option>(null);
   const { values, setFieldValue } = useFormikContext<FormValues>();
-
+  const dispatch = useDispatch();
   useEffect(() => {
     setSelectedOption(values.property?.property_status || null);
   }, [values.property?.property_status]);
 
   const handleOptionClick = (option: Option) => {
-    setSelectedOption(option);
-    setFieldValue("property.property_status", option);
-    next();
+    if (option) {
+      setSelectedOption(option);
+      setFieldValue("property.property_status", option);
+      next();
+      // dispatch(setError(false));
+    } else {
+      // dispatch(setError(true));
+    }
   };
 
   return (

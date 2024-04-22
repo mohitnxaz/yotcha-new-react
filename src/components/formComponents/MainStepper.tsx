@@ -8,10 +8,11 @@ import SubStep1 from "./SubStep1";
 import SubStep2 from "./SubStep2";
 import SubStep3 from "./SubStep3";
 import SubStep4 from "./SubStep4";
-import { Formik, Form } from "formik";
+import { Formik, Form, useFormikContext } from "formik";
 import * as Yup from "yup";
 import { useCreateProperty } from "../../hooks/property/useProperty";
 import { PropertyListing } from "../../api/addProperty/propertyApi";
+import { useSelector } from "react-redux";
 
 export interface PropertyType {
   id: number;
@@ -108,6 +109,7 @@ const MainStepper = () => {
   const totalSteps = 4;
   const totalSubStepsInStep1 = 3;
   const [searchQuery, setSearchQuery] = useState("");
+  const isErrorPresent = useSelector((state: any) => state.addProperty.isError);
   const [searchResult, setSearchResult] = useState<{
     lat: number;
     lng: number;
@@ -124,6 +126,28 @@ const MainStepper = () => {
       setCurrentStep(currentStep + 1);
       setCurrentSubStep(0);
     }
+  };
+
+  const NextButton = () => {
+    const { isValid } = useFormikContext();
+    useEffect(() => {
+      console.log("isValid:", isValid);
+    }, [isValid]);
+    return (
+      <button
+        type="button"
+        onClick={nextStep}
+        disabled={!isValid}
+        className={`flex items-center justify-center gap-[6px] max-w-full w-[60%] bg-white ${
+          !isValid ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+      >
+        <img src={next} alt={""} />
+        <p className="text-primary font-[500] text-[15px] leading-[24px]">
+          Next
+        </p>
+      </button>
+    );
   };
 
   const prevStep = () => {
@@ -267,12 +291,59 @@ const MainStepper = () => {
     return nextId;
   }
 
-  const validationSchema = Yup.object().shape({
+  const validationSchemaSubStep1 = Yup.object().shape({
     property: Yup.object().shape({
-      property_type: Yup.number().required("Property type is required"),
-      price: Yup.number().required("Price is required"),
+      address: Yup.string().required(
+        "Please select an address before proceeding."
+      ),
     }),
   });
+
+  const validationSchemaSubStep2 = Yup.object().shape({
+    property: Yup.object().shape({
+      // address: Yup.string().required(
+      //   "Please select an address before proceeding."
+      // ),
+      bed_room: Yup.string().required("Bedroom specification is required"),
+      bath_room: Yup.string().required("Bathroom specification is required"),
+    }),
+  });
+
+  const validationSchemaSubStep3 = Yup.object().shape({
+    property: Yup.object().shape({
+      bed_room: Yup.string().required("Bedroom specification is required"),
+      bath_room: Yup.string().required("Bathroom specification is required"),
+    }),
+  });
+
+  const getValidationSchemaForSubStep = (subStepIndex: number) => {
+    console.log("substep", subStepIndex);
+    switch (subStepIndex) {
+      case 0:
+        return validationSchemaSubStep1;
+      case 1:
+        return validationSchemaSubStep1;
+      case 2:
+        return validationSchemaSubStep2;
+      default:
+        return Yup.object().shape({
+          property: Yup.object().shape({
+            // Default schema if substep index is out of range
+            address: Yup.string().required(
+              "Please select an address before proceeding."
+            ),
+            property_type: Yup.string().required("Property type is required"),
+            price: Yup.number().required("Price is required"),
+            bed_room: Yup.number().required(
+              "Bedroom specification is required"
+            ),
+            bath_room: Yup.number().required(
+              "Bathroom specification is required"
+            ),
+          }),
+        });
+    }
+  };
 
   const handleSubmit = (values: {
     property: {
@@ -354,7 +425,7 @@ const MainStepper = () => {
     <Formik
       initialValues={initialMainStepperValues}
       onSubmit={handleSubmit}
-      // validationSchema={validationSchema}
+      validationSchema={getValidationSchemaForSubStep(currentSubStep)}
     >
       <Form className="w-full">
         <div className="w-[100%]">
@@ -375,8 +446,8 @@ const MainStepper = () => {
               ? stepDetails.map((detail, index) => (
                   <span
                     key={index}
-                    onClick={() => goToStep(index + 1)}
-                    className={`max-w-full w-full h-[100px] flex flex-col items-center justify-center hover:cursor-pointer  ${
+                    // onClick={() => goToStep(index + 1)}
+                    className={`max-w-full w-full h-[100px] flex flex-col items-center justify-center ${
                       currentStep === index + 1
                         ? "text-white bg-primary"
                         : "bg-white  border-r-[1px] border-[_rgba(0,0,0,0.20)]"
@@ -415,16 +486,7 @@ const MainStepper = () => {
                 </p>
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={nextStep}
-                className="flex items-center justify-center gap-[6px] max-w-full w-[60%] bg-white"
-              >
-                <img src={next} alt={""} />
-                <p className="text-primary font-[500] text-[15px] leading-[24px]">
-                  Next
-                </p>
-              </button>
+              <NextButton />
             )}
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 import React, {
   ChangeEvent,
   createRef,
@@ -15,12 +14,12 @@ import { useFormikContext } from "formik";
 
 import { useDispatch, useSelector } from "react-redux";
 import { getPropertyTypes } from "../../api/addProperty/propertyApi";
-import { Property, PropertyType } from "../../types";
+import { Property, PropertyType, PropertyTypesFormik } from "../../types";
 import { setError } from "../../store/slices/addProperty/addProperty.reducers";
 import FormikCard from "./components/FormikCard";
 import FormInput from "../FormInput";
 import { Input } from "../ui/input";
-
+import { FormValues } from "./SubStep2";
 
 interface SearchResult {
   lat: number;
@@ -33,7 +32,7 @@ interface SubStep3Props {
   searchResult: SearchResult | null;
 }
 
-const SubStep3: React.FC<SubStep3Props> = ({  }) => {
+const SubStep3: React.FC<SubStep3Props> = ({}) => {
   const { data: queryData, isLoading } = useQuery({
     queryKey: ["propertyTypes"],
     queryFn: () => getPropertyTypes(),
@@ -76,18 +75,14 @@ const SubStep3: React.FC<SubStep3Props> = ({  }) => {
       inputElement.removeEventListener("keyup", handleKeyUp);
     };
   };
+  const { values, setFieldValue, errors, touched, handleSubmit } =
+    useFormikContext<PropertyTypesFormik>();
 
   useEffect(() => {
-    if (
-      inputValueAddress !== "" &&
-      inputValueUnitN !== Number("0") &&
-      inputValueSize !== Number("0")
-    ) {
-      dispatch(setError(false));
-    } else {
+    if (values.property.bath_room === null || "") {
       dispatch(setError(true));
     }
-  }, [inputValueAddress, inputValueUnitN, inputValueSize]);
+  }, [errors, dispatch]);
 
   const handleInputChangeU = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
@@ -134,9 +129,6 @@ const SubStep3: React.FC<SubStep3Props> = ({  }) => {
       inputElement.removeEventListener("keyup", handleKeyUp);
     };
   };
-
-  const { values, setFieldValue, errors, touched } =
-    useFormikContext<Property>();
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: "YOUR_API_KEY",
@@ -213,7 +205,7 @@ const SubStep3: React.FC<SubStep3Props> = ({  }) => {
           </div>
           <FormSingleSelectButton
             title="No of bed rooms"
-            options={["Studio", "1", "2", "3", "4", "5"]}
+            options={["0", "1", "2", "3", "4", "5"]}
             selected={values.property.bed_room}
             onSelect={(selected) =>
               setFieldValue("property.bed_room", selected)

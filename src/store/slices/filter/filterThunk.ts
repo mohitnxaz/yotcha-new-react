@@ -27,3 +27,14 @@ export const getFilteredListingsAsync = createAsyncThunk(
    
   }
 );
+
+
+export const getPagninatedResultsAsync = createAsyncThunk(
+  "filter/getPaginatedResults",
+  async (args: any, { getState }) => {
+    let filteredListings = [];
+      filteredListings = (await filterAPI.getFilteredListing(args))?.data || [];
+    return filteredListings;
+   
+  }
+);
